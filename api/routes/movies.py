@@ -6,35 +6,39 @@ from api.dao.ratings import RatingDAO
 
 movie_routes = Blueprint("movies", __name__, url_prefix="/api/movies")
 
+
 # tag::list[]
-@movie_routes.get('/')
+@movie_routes.get("/")
 @jwt_required(optional=True)
 def get_movies():
-    # Extract pagination values from the request
+    # Extract pagination values from the request.
+    # If no value is provided, use the default.
     sort = request.args.get("sort", "title")
     order = request.args.get("order", "ASC")
     limit = request.args.get("limit", 6, type=int)
     skip = request.args.get("skip", 0, type=int)
 
-    # Get User ID from JWT Auth
-    user_id = current_user["sub"] if current_user != None else None
+    # Get User ID from JWT Auth.
+    user_id = current_user["sub"] if current_user is not None else None
 
-    # Create a new MovieDAO Instance
+    # Create a new MovieDAO Instance.
     dao = MovieDAO(current_app.driver)
 
-    # Retrieve a paginated list of movies
+    # Retrieve a paginated list of movies.
     output = dao.all(sort, order, limit=limit, skip=skip, user_id=user_id)
 
     # Return as JSON
     return jsonify(output)
+
+
 # end::list[]
 
 
-@movie_routes.get('/<movie_id>')
+@movie_routes.get("/<movie_id>")
 @jwt_required(optional=True)
 def get_movie_details(movie_id):
     # Get User ID from JWT Auth
-    user_id = current_user["sub"] if current_user != None else None
+    user_id = current_user["sub"] if current_user is not None else None
 
     # Create a new MovieDAO Instance
     dao = MovieDAO(current_app.driver)
@@ -45,7 +49,7 @@ def get_movie_details(movie_id):
     return jsonify(movie)
 
 
-@movie_routes.get('/<movie_id>/ratings')
+@movie_routes.get("/<movie_id>/ratings")
 def get_movie_ratings(movie_id):
     # Extract pagination values from the request
     sort = request.args.get("sort", "timestamp")
@@ -62,11 +66,11 @@ def get_movie_ratings(movie_id):
     return jsonify(ratings)
 
 
-@movie_routes.get('/<movie_id>/similar')
+@movie_routes.get("/<movie_id>/similar")
 @jwt_required(optional=True)
 def get_similar_movies(movie_id):
     # Get User ID from JWT Auth
-    user_id = current_user["sub"] if current_user != None else None
+    user_id = current_user["sub"] if current_user is not None else None
 
     # Extract pagination values from the request
     limit = request.args.get("limit", 6, type=int)
@@ -79,4 +83,3 @@ def get_similar_movies(movie_id):
     output = dao.get_similar_movies(movie_id, limit, skip, user_id)
 
     return jsonify(output)
-

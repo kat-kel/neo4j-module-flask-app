@@ -1,8 +1,14 @@
+import unittest
+
 import os
 from api.neo4j import close_driver, get_driver
+from dotenv import load_dotenv, find_dotenv
+
 
 def test_env_vars():
     """Test that environment variables have been set"""
+
+    load_dotenv(find_dotenv())
 
     assert "NEO4J_URI" in os.environ
     assert "NEO4J_USERNAME" in os.environ
